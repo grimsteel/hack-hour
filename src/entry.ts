@@ -25,21 +25,27 @@ if (process.env.ARCADE) {
 import "./extensions/api/index.js";
 import "./extensions/slack/index.js";
 
-try {
-    await prisma.$connect();
-    const server = await app.start(process.env.PORT || 3000);
+async function main() {
+    try {
+        await prisma.$connect();
+        const server = await app.start(process.env.PORT || 3000);
 
-    emitter.emit("init", server);
-    emitter.emit("minute");
+        emitter.emit("init", server);
+        emitter.emit("minute");
 
-    console.log(`⏳ Let the Hack Houring Begin! Running on port ${process.env.PORT || 3000}...`);
-} catch (error) {
-    console.error(error);
+        console.log(`⏳ Let the Hack Houring Begin! Running on port ${process.env.PORT || 3000}...`);
+    } catch (error) {
+        console.error(error);
 
-    emitter.emit("error", error);
+        emitter.emit("error", error);
 
-    await prisma.$disconnect();
-    await app.stop();
-    
-    process.exit(1);        
+        await prisma.$disconnect();
+        await app.stop();
+
+        process.exit(1);
+    }
+}
+
+while (true) {
+    await main();
 }
